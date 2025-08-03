@@ -180,6 +180,30 @@ async def dar(ctx, member: discord.Member, quantidade: int):
     )
     await ctx.send(embed=embed)
 
+@bot.command(name='remover')
+@commands.has_permissions(administrator=True)
+async def remover(ctx, member: discord.Member, quantidade: int):
+    data = load_data()
+    user_id = str(member.id)
+    
+    if user_id not in data['users']:
+        data['users'][user_id] = {'tokens': 0}
+    
+    # Não permitir que fique negativo
+    if data['users'][user_id]['tokens'] < quantidade:
+        await ctx.send(f"❌ {member.mention} só tem {data['users'][user_id]['tokens']} tokens!")
+        return
+    
+    data['users'][user_id]['tokens'] -= quantidade
+    save_data(data)
+    
+    embed = discord.Embed(
+        title="✅ Tokens Removidos!",
+        description=f"{quantidade} tokens foram removidos de {member.mention}",
+        color=0xff9900
+    )
+    await ctx.send(embed=embed)
+
 @bot.command(name='adicionar_item')
 @commands.has_permissions(administrator=True)
 async def adicionar_item(ctx, preco: int, *, nome_descricao):
@@ -208,6 +232,7 @@ async def adicionar_item(ctx, preco: int, *, nome_descricao):
     await ctx.send(embed=embed)
 
 @dar.error
+@remover.error
 @adicionar_item.error
 async def permission_error(ctx, error):
     if isinstance(error, commands.MissingPermissions):
