@@ -1,10 +1,5 @@
 import sys
 import os
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
-from keep_alive import keep_alive
-keep_alive()
-
 import discord
 from discord.ext import commands
 import json
